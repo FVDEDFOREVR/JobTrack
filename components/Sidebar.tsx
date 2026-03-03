@@ -40,7 +40,7 @@ export default function Sidebar() {
       </nav>
 
       <div className="px-5 py-4 border-t border-white/5 flex items-center gap-3">
-        <UserButton afterSignOutUrl="/" appearance={{ elements: { avatarBox: "w-7 h-7" } }} />
+        <UserButton appearance={{ elements: { avatarBox: "w-7 h-7" } }} />
         <span className="text-xs text-gray-600">Account</span>
       </div>
     </aside>

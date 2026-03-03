@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
+import { useAuth } from "@clerk/nextjs";
 
 const features = [
   { icon: "◈", title: "Application Tracker", desc: "Log every job you apply to. Track status from bookmarked to offer." },
@@ -11,6 +13,8 @@ const features = [
 ];
 
 export default function LandingPage() {
+  const { isSignedIn } = useAuth();
+
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-gray-100">
       {/* Nav */}
@@ -20,21 +24,18 @@ export default function LandingPage() {
           <span className="font-semibold text-white text-sm tracking-tight">JobTrack</span>
         </div>
         <div className="flex items-center gap-3">
-          <SignedOut>
-            <Link href="/sign-in" className="text-sm text-gray-400 hover:text-white transition-colors px-3 py-2">
-              Sign in
-            </Link>
-            <Link href="/sign-up"
-              className="text-sm font-medium bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-lg transition-colors">
-              Get started free
-            </Link>
-          </SignedOut>
-          <SignedIn>
-            <Link href="/dashboard"
-              className="text-sm font-medium bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-lg transition-colors">
+          {isSignedIn ? (
+            <Link href="/dashboard" className="text-sm font-medium bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-lg transition-colors">
               Go to app
             </Link>
-          </SignedIn>
+          ) : (
+            <>
+              <Link href="/sign-in" className="text-sm text-gray-400 hover:text-white transition-colors px-3 py-2">Sign in</Link>
+              <Link href="/sign-up" className="text-sm font-medium bg-violet-600 hover:bg-violet-500 text-white px-4 py-2 rounded-lg transition-colors">
+                Get started free
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -51,36 +52,32 @@ export default function LandingPage() {
           Stop losing track of applications in spreadsheets. JobTrack is a free CRM built for job seekers — track every application, interview, and follow-up in one place.
         </p>
         <div className="flex items-center justify-center gap-4 flex-wrap">
-          <SignedOut>
-            <Link href="/sign-up"
-              className="px-8 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-base">
-              Start tracking for free
-            </Link>
-            <Link href="/sign-in"
-              className="px-8 py-3.5 bg-white/5 hover:bg-white/10 text-gray-300 font-medium rounded-xl transition-colors text-base border border-white/10">
-              Sign in
-            </Link>
-          </SignedOut>
-          <SignedIn>
-            <Link href="/dashboard"
-              className="px-8 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-base">
+          {isSignedIn ? (
+            <Link href="/dashboard" className="px-8 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-base">
               Go to your dashboard
             </Link>
-          </SignedIn>
+          ) : (
+            <>
+              <Link href="/sign-up" className="px-8 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-base">
+                Start tracking for free
+              </Link>
+              <Link href="/sign-in" className="px-8 py-3.5 bg-white/5 hover:bg-white/10 text-gray-300 font-medium rounded-xl transition-colors text-base border border-white/10">
+                Sign in
+              </Link>
+            </>
+          )}
         </div>
       </section>
 
       {/* App Preview */}
       <section className="max-w-5xl mx-auto px-6 pb-20">
         <div className="bg-[#141414] border border-white/10 rounded-2xl overflow-hidden shadow-2xl">
-          {/* Fake browser bar */}
           <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-[#111]">
             <div className="w-3 h-3 rounded-full bg-red-500/50" />
             <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
             <div className="w-3 h-3 rounded-full bg-green-500/50" />
             <div className="flex-1 mx-4 bg-white/5 rounded px-3 py-1 text-xs text-gray-600">jobtrack.app/dashboard</div>
           </div>
-          {/* Mock dashboard */}
           <div className="p-6">
             <div className="grid grid-cols-4 gap-3 mb-5">
               {[["6", "Total Apps", "text-white"], ["3", "Active", "text-violet-400"], ["1", "Offers", "text-emerald-400"], ["67%", "Response", "text-blue-400"]].map(([v, l, c]) => (
@@ -126,18 +123,15 @@ export default function LandingPage() {
       <section className="border-t border-white/5 py-20 text-center px-6">
         <h2 className="text-3xl font-bold text-white mb-4">Ready to get organized?</h2>
         <p className="text-gray-500 mb-8">Join thousands of job seekers who use JobTrack to land their next role.</p>
-        <SignedOut>
-          <Link href="/sign-up"
-            className="inline-block px-8 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-base">
-            Create your free account
-          </Link>
-        </SignedOut>
-        <SignedIn>
-          <Link href="/dashboard"
-            className="inline-block px-8 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-base">
+        {isSignedIn ? (
+          <Link href="/dashboard" className="inline-block px-8 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-base">
             Go to your dashboard
           </Link>
-        </SignedIn>
+        ) : (
+          <Link href="/sign-up" className="inline-block px-8 py-3.5 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors text-base">
+            Create your free account
+          </Link>
+        )}
       </section>
 
       {/* Footer */}
