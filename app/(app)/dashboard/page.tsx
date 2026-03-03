@@ -48,12 +48,36 @@ export default function DashboardPage() {
     ? Math.round(((totalJobs - (statusMap["bookmarked"] || 0) - (statusMap["rejected"] || 0)) / totalJobs) * 100)
     : 0;
 
+  const isEmpty = totalJobs === 0;
+
   return (
     <div className="p-8 max-w-6xl mx-auto">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
-        <p className="text-gray-500 text-sm mt-1">Your job search at a glance</p>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-semibold text-white">Dashboard</h1>
+          <p className="text-gray-500 text-sm mt-1">Your job search at a glance</p>
+        </div>
+        <Link href="/jobs"
+          className="px-4 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors">
+          + Add Application
+        </Link>
       </div>
+
+      {/* Empty state — first time user */}
+      {isEmpty && (
+        <div className="bg-[#1a1a1a] border border-violet-500/20 rounded-2xl p-10 mb-8 text-center">
+          <div className="text-4xl mb-4">◈</div>
+          <h2 className="text-xl font-semibold text-white mb-2">Add your first application</h2>
+          <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
+            Start tracking roles you've applied to. Your pipeline, tasks, and activity log update automatically.
+          </p>
+          <Link href="/jobs"
+            className="inline-block px-6 py-3 bg-violet-600 hover:bg-violet-500 text-white font-semibold rounded-xl transition-colors">
+            + Add Your First Application
+          </Link>
+        </div>
+      )}
+
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
