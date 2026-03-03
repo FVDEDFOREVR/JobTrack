@@ -1,0 +1,113 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  userId    String
+  name      String
+  website   String?
+  industry  String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  jobs      Job[]
+  contacts  Contact[]
+
+  @@index([userId])
+}
+
+model Job {
+  id            String    @id @default(cuid())
+  userId        String
+  title         String
+  companyId     String?
+  company       Company?  @relation(fields: [companyId], references: [id])
+  companyName   String
+  url           String?
+  status        String    @default("bookmarked")
+  salaryMin     Int?
+  salaryMax     Int?
+  location      String?
+  locationType  String?
+  dateApplied   DateTime?
+  notes         String?
+  resumeVersion String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  activities Activity[]
+  tasks      Task[]
+  contacts   ContactJob[]
+
+  @@index([userId])
+}
+
+model Contact {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  email       String?
+  phone       String?
+  role        String?
+  linkedIn    String?
+  companyId   String?
+  company     Company? @relation(fields: [companyId], references: [id])
+  companyName String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  jobs       ContactJob[]
+  activities Activity[]
+  tasks      Task[]
+
+  @@index([userId])
+}
+
+model ContactJob {
+  id        String  @id @default(cuid())
+  contactId String
+  jobId     String
+  contact   Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  job       Job     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([contactId, jobId])
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  notes     String?
+  date      DateTime @default(now())
+  jobId     String?
+  job       Job?     @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  contactId String?
+  contact   Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Task {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  done      Boolean   @default(false)
+  dueDate   DateTime?
+  jobId     String?
+  job       Job?      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  contactId String?
+  contact   Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId])
+}
