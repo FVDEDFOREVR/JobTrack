@@ -10,6 +10,7 @@ const navItems = [
   { href: "/jobs",       label: "Applications", icon: "◈", section: "MAIN" },
   { href: "/pipeline",   label: "Pipeline",     icon: "⬕", section: "MAIN" },
   { href: "/contacts",   label: "Contacts",     icon: "◉", section: "NETWORK" },
+  { href: "/resume",     label: "Resume",       icon: "◫", section: "NETWORK" },
   { href: "/tasks",      label: "Tasks",        icon: "◻", section: "PRODUCTIVITY" },
 ];
 
