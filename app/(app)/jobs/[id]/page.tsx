@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, notFound } from "next/navigation";
 import Link from "next/link";
 import StatusBadge from "@/components/StatusBadge";
 
@@ -62,6 +62,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
   const fetchJob = async () => {
     const res = await fetch(`/api/jobs/${id}`);
+    if (res.status === 404) { notFound(); return; }
     const data = await res.json();
     setJob(data);
     setLoading(false);
@@ -123,7 +124,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
   };
 
   if (loading) return <div className="p-8 text-white/20">Loading...</div>;
-  if (!job) return <div className="p-8 text-white/20">Job not found</div>;
+  if (!job) return null;
 
   const inputClass = "bg-white/[0.05] border border-white/[0.1] rounded-xl px-3 py-2 text-sm text-white/80 placeholder-white/25 focus:outline-none focus:border-violet-500/50 transition-colors";
 
