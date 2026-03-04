@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useCallback, useEffect, useState, use } from "react";
 import { useRouter, notFound } from "next/navigation";
 import Link from "next/link";
 import StatusBadge from "@/components/StatusBadge";
@@ -29,6 +29,48 @@ const ACTIVITY_ICONS: Record<string, string> = Object.fromEntries(
   ACTIVITY_TYPES.map((t) => [t.value, t.icon])
 );
 
+interface JobContactLink {
+  contact: {
+    id: string;
+    name: string;
+    role: string | null;
+  };
+}
+
+interface JobActivity {
+  id: string;
+  type: string;
+  title: string;
+  notes: string | null;
+  date: string;
+}
+
+interface JobTask {
+  id: string;
+  title: string;
+  done: boolean;
+  dueDate: string | null;
+}
+
+interface JobDetail {
+  id: string;
+  title: string;
+  companyName: string;
+  location: string | null;
+  locationType: string | null;
+  salaryMin: number | null;
+  salaryMax: number | null;
+  url: string | null;
+  status: string;
+  dateApplied: string | null;
+  resumeVersion: string | null;
+  createdAt: string;
+  notes: string | null;
+  contacts?: JobContactLink[];
+  activities?: JobActivity[];
+  tasks?: JobTask[];
+}
+
 function formatDate(d: string | null) {
   if (!d) return "—";
   return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -45,7 +87,7 @@ function formatSalary(min?: number | null, max?: number | null) {
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const router = useRouter();
-  const [job, setJob] = useState<any>(null);
+  const [job, setJob] = useState<JobDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"activity" | "tasks" | "notes">("activity");
 
@@ -60,15 +102,18 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
   // Edit status
   const [editingStatus, setEditingStatus] = useState(false);
 
-  const fetchJob = async () => {
+  const fetchJob = useCallback(async () => {
     const res = await fetch(`/api/jobs/${id}`);
     if (res.status === 404) { notFound(); return; }
     const data = await res.json();
-    setJob(data);
+    setJob(data as JobDetail);
     setLoading(false);
-  };
+  }, [id]);
 
-  useEffect(() => { fetchJob(); }, [id]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchJob();
+  }, [fetchJob]);
 
   const updateStatus = async (status: string) => {
     await fetch(`/api/jobs/${id}`, {
@@ -127,6 +172,9 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
   if (!job) return null;
 
   const inputClass = "bg-white/[0.05] border border-white/[0.1] rounded-xl px-3 py-2 text-sm text-white/80 placeholder-white/25 focus:outline-none focus:border-violet-500/50 transition-colors";
+  const contacts = job.contacts ?? [];
+  const activities = job.activities ?? [];
+  const tasks = job.tasks ?? [];
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
@@ -209,11 +257,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
       </div>
 
       {/* Contacts */}
-      {job.contacts?.length > 0 && (
+      {contacts.length > 0 && (
         <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 mb-5">
           <h3 className="text-xs text-white/35 uppercase tracking-widest font-semibold mb-3">Contacts</h3>
           <div className="flex flex-wrap gap-3">
-            {job.contacts.map((cj: any) => (
+            {contacts.map((cj: JobContactLink) => (
               <Link
                 key={cj.contact.id}
                 href={`/contacts`}
@@ -249,11 +297,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             style={activeTab === tab ? { background: "rgba(139,92,246,0.2)" } : {}}
           >
             {tab}
-            {tab === "activity" && job.activities?.length > 0 && (
-              <span className="ml-1.5 text-xs text-white/25">({job.activities.length})</span>
+            {tab === "activity" && activities.length > 0 && (
+              <span className="ml-1.5 text-xs text-white/25">({activities.length})</span>
             )}
-            {tab === "tasks" && job.tasks?.length > 0 && (
-              <span className="ml-1.5 text-xs text-white/25">({job.tasks.length})</span>
+            {tab === "tasks" && tasks.length > 0 && (
+              <span className="ml-1.5 text-xs text-white/25">({tasks.length})</span>
             )}
           </button>
         ))}
@@ -314,13 +362,13 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
           </form>
 
           {/* Activity List */}
-          {job.activities?.length === 0 ? (
+          {activities.length === 0 ? (
             <p className="text-white/20 text-sm text-center py-8">No activity logged yet</p>
           ) : (
             <div className="relative">
               <div className="absolute left-4 top-0 bottom-0 w-px bg-white/[0.06]" />
               <div className="space-y-0">
-                {job.activities?.map((act: any) => (
+                {activities.map((act: JobActivity) => (
                   <div key={act.id} className="flex gap-4 pb-4 relative">
                     <div className="w-8 h-8 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-sm shrink-0 z-10 text-white/50">
                       {ACTIVITY_ICONS[act.type] || "·"}
@@ -369,11 +417,11 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             </div>
           </form>
 
-          {job.tasks?.length === 0 ? (
+          {tasks.length === 0 ? (
             <p className="text-white/20 text-sm text-center py-8">No tasks yet</p>
           ) : (
             <div className="space-y-2">
-              {job.tasks?.map((task: any) => {
+              {tasks.map((task: JobTask) => {
                 const isOverdue = !task.done && task.dueDate && new Date(task.dueDate) < new Date();
                 return (
                   <div

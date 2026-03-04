@@ -111,3 +111,80 @@ model Task {
 
   @@index([userId])
 }
+
+model ResumeProfile {
+  userId       String   @id
+  fullName     String?
+  email        String?
+  phone        String?
+  location     String?
+  linkedinUrl  String?
+  portfolioUrl String?
+  summary      String?
+  rawText      String?
+  sourceFileName String?
+  sourceFileType String?
+  sourceFileSize Int?
+  sourceFileData Bytes?
+  updatedAt    DateTime @updatedAt
+
+  workExperiences ResumeWorkExperience[]
+  educations      ResumeEducation[]
+  skills          ResumeSkill[]
+}
+
+model ResumeWorkExperience {
+  id          String    @id @default(cuid())
+  userId      String
+  company     String
+  title       String
+  startDate   DateTime?
+  endDate     DateTime?
+  isCurrent   Boolean   @default(false)
+  bulletsJson Json      @default("[]")
+  sortOrder   Int       @default(0)
+  profile     ResumeProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ResumeEducation {
+  id        String    @id @default(cuid())
+  userId    String
+  school    String
+  degree    String?
+  field     String?
+  startDate DateTime?
+  endDate   DateTime?
+  sortOrder Int       @default(0)
+  profile   ResumeProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model ResumeSkill {
+  id      String @id @default(cuid())
+  userId  String
+  skill   String
+  profile ResumeProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@unique([userId, skill])
+  @@index([userId])
+}
+
+model ResumeDocument {
+  id             String   @id @default(cuid())
+  userId         String
+  title          String
+  fullName       String?
+  rawText        String?
+  sourceFileName String?
+  sourceFileType String?
+  sourceFileSize Int?
+  sourceFileData Bytes?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+  @@index([createdAt])
+}

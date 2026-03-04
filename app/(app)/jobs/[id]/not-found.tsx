@@ -5,7 +5,7 @@ export default function JobNotFound() {
     <div className="p-8 flex flex-col items-center justify-center min-h-[60vh] text-center">
       <p className="text-6xl font-black text-white/10 mb-4">404</p>
       <h1 className="text-xl font-bold text-white mb-2">Job not found</h1>
-      <p className="text-white/35 text-sm mb-6">This application doesn't exist or you don't have access to it.</p>
+      <p className="text-white/35 text-sm mb-6">This application doesn&apos;t exist or you don&apos;t have access to it.</p>
       <Link
         href="/jobs"
         className="px-5 py-2.5 text-white text-sm font-semibold rounded-xl transition-all glow-btn"

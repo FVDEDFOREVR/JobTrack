@@ -5,6 +5,34 @@ import Link from "next/link";
 import Image from "next/image";
 import { useModal } from "@/contexts/ModalContext";
 
+interface DashboardTask {
+  id: string;
+  title: string;
+  dueDate: string | null;
+  job?: {
+    companyName: string;
+    title: string;
+  } | null;
+}
+
+interface DashboardActivity {
+  id: string;
+  type: string;
+  title: string;
+  notes?: string | null;
+  date: string;
+  job?: {
+    companyName: string;
+  } | null;
+}
+
+interface DashboardPayload {
+  totalJobs: number;
+  statusMap: Record<string, number>;
+  upcomingTasks: DashboardTask[];
+  recentActivities: DashboardActivity[];
+}
+
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   bookmarked:   { label: "Bookmarked",   color: "text-white/45" },
   applied:      { label: "Applied",      color: "text-blue-400" },
@@ -35,10 +63,39 @@ function formatRelative(d: string) {
 }
 
 export default function DashboardPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<DashboardPayload | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const { openAddApplicationModal } = useModal();
 
-  const fetchStats = () => fetch("/api/stats").then((r) => r.json()).then(setData);
+  const fetchStats = async () => {
+    setError(null);
+    try {
+      const res = await fetch("/api/stats");
+      if (!res.ok) {
+        const text = await res.text();
+        let message = "Failed to load dashboard";
+        if (text) {
+          try {
+            const parsed = JSON.parse(text);
+            if (parsed?.error) message = parsed.error;
+          } catch {
+            // Ignore non-JSON responses and keep fallback message.
+          }
+        }
+        throw new Error(message);
+      }
+      const payload = await res.json();
+      setData(payload);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load dashboard");
+      setData({
+        totalJobs: 0,
+        statusMap: {},
+        upcomingTasks: [],
+        recentActivities: [],
+      });
+    }
+  };
 
   useEffect(() => {
     fetchStats();
@@ -49,7 +106,10 @@ export default function DashboardPage() {
 
   if (!data) return <div className="p-8 text-white/25">Loading...</div>;
 
-  const { totalJobs, statusMap, upcomingTasks, recentActivities } = data;
+  const totalJobs = typeof data?.totalJobs === "number" ? data.totalJobs : 0;
+  const statusMap = data?.statusMap && typeof data.statusMap === "object" ? data.statusMap : {};
+  const upcomingTasks = Array.isArray(data?.upcomingTasks) ? data.upcomingTasks : [];
+  const recentActivities = Array.isArray(data?.recentActivities) ? data.recentActivities : [];
   const activeCount = (statusMap["applied"] || 0) + (statusMap["phone_screen"] || 0) + (statusMap["interview"] || 0);
   const offerCount = statusMap["offer"] || 0;
   const responseRate = totalJobs > 0
@@ -60,6 +120,11 @@ export default function DashboardPage() {
 
   return (
     <div className="p-8">
+      {error && (
+        <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {error}
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -69,6 +134,7 @@ export default function DashboardPage() {
             width={160}
             height={45}
             className="object-contain mb-1"
+            style={{ height: "auto" }}
             priority
           />
           <p className="text-white/35 text-sm mt-1">Your job search at a glance</p>
@@ -90,9 +156,9 @@ export default function DashboardPage() {
               <span className="text-xs font-bold text-violet-400 uppercase tracking-widest px-2.5 py-1 rounded-full border border-violet-500/30"
                 style={{ background: "rgba(139,92,246,0.12)" }}>Step 1</span>
             </div>
-            <h2 className="text-xl font-bold text-white mb-2 tracking-tight">Add a job you're tracking</h2>
+            <h2 className="text-xl font-bold text-white mb-2 tracking-tight">Add a job you&apos;re tracking</h2>
             <p className="text-white/40 text-sm mb-6 leading-relaxed">
-              Start with a role you've already applied to. Once added, JobTrack will automatically track your pipeline, tasks, and activity.
+              Start with a role you&apos;ve already applied to. Once added, JobTrack will automatically track your pipeline, tasks, and activity.
             </p>
             <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 mb-6 flex flex-col gap-2">
               <p className="text-[10px] text-white/25 uppercase tracking-widest font-semibold mb-1">Example</p>
@@ -182,7 +248,7 @@ export default function DashboardPage() {
             <p className="text-white/20 text-sm py-4 text-center">No upcoming tasks</p>
           ) : (
             <div className="space-y-2">
-              {upcomingTasks.map((task: any) => {
+              {upcomingTasks.map((task: DashboardTask) => {
                 const isOverdue = task.dueDate && new Date(task.dueDate) < new Date();
                 return (
                   <div key={task.id} className="flex items-start gap-3 py-2.5 border-b border-white/[0.05] last:border-0">
@@ -210,7 +276,7 @@ export default function DashboardPage() {
             <p className="text-white/20 text-sm py-4 text-center">No activity yet</p>
           ) : (
             <div>
-              {recentActivities.map((act: any) => (
+              {recentActivities.map((act: DashboardActivity) => (
                 <div key={act.id} className="flex items-start gap-3 py-2.5 border-b border-white/[0.05] last:border-0">
                   <span className="text-sm text-white/30 w-4 shrink-0 mt-0.5">{ACTIVITY_ICONS[act.type] || "·"}</span>
                   <div className="flex-1 min-w-0">

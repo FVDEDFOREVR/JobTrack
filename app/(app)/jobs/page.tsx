@@ -5,6 +5,22 @@ import Link from "next/link";
 import StatusBadge from "@/components/StatusBadge";
 import { useModal } from "@/contexts/ModalContext";
 
+interface JobListItem {
+  id: string;
+  title: string;
+  companyName: string;
+  status: string;
+  location: string | null;
+  locationType: string | null;
+  salaryMin: number | null;
+  salaryMax: number | null;
+  dateApplied: string | null;
+  _count?: {
+    activities?: number;
+    tasks?: number;
+  };
+}
+
 const STATUSES = ["", "bookmarked", "applied", "phone_screen", "interview", "offer", "rejected", "withdrawn"];
 const STATUS_LABELS: Record<string, string> = {
   "": "All",
@@ -37,21 +53,45 @@ function formatDate(d: string | null) {
 }
 
 export default function JobsPage() {
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<JobListItem[]>([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { openAddApplicationModal } = useModal();
 
   const fetchJobs = useCallback(async () => {
     setLoading(true);
-    const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    if (status) params.set("status", status);
-    const res = await fetch(`/api/jobs?${params}`);
-    const data = await res.json();
-    setJobs(data);
-    setLoading(false);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (status) params.set("status", status);
+
+      const res = await fetch(`/api/jobs?${params}`);
+      if (!res.ok) {
+        const text = await res.text();
+        let message = "Failed to load jobs";
+        if (text) {
+          try {
+            const parsed = JSON.parse(text);
+            if (parsed?.error) message = parsed.error;
+          } catch {
+            // Ignore non-JSON responses and use fallback message.
+          }
+        }
+        throw new Error(message);
+      }
+
+      const data = await res.json();
+      setJobs(Array.isArray(data) ? data : []);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load jobs";
+      setError(message);
+      setJobs([]);
+    } finally {
+      setLoading(false);
+    }
   }, [search, status]);
 
   useEffect(() => {
@@ -113,6 +153,11 @@ export default function JobsPage() {
       {/* Jobs List */}
       {loading ? (
         <div className="text-center py-16 text-white/20">Loading...</div>
+      ) : error ? (
+        <div className="text-center py-16">
+          <p className="text-red-300/90 text-lg mb-2">Couldn&apos;t load applications</p>
+          <p className="text-white/35 text-sm">{error}</p>
+        </div>
       ) : jobs.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-white/35 text-lg mb-2">No applications found</p>
@@ -120,7 +165,10 @@ export default function JobsPage() {
         </div>
       ) : (
         <div className="space-y-2">
-          {jobs.map((job) => (
+          {jobs.map((job) => {
+            const activityCount = job._count?.activities ?? 0;
+            const taskCount = job._count?.tasks ?? 0;
+            return (
             <Link
               key={job.id}
               href={`/jobs/${job.id}`}
@@ -157,17 +205,18 @@ export default function JobsPage() {
                     <p className="text-xs text-white/25">Applied {formatDate(job.dateApplied)}</p>
                   )}
                   <div className="flex items-center gap-2 mt-1 justify-end">
-                    {job._count?.activities > 0 && (
-                      <span className="text-xs text-white/25">{job._count.activities} activities</span>
+                    {activityCount > 0 && (
+                      <span className="text-xs text-white/25">{activityCount} activities</span>
                     )}
-                    {job._count?.tasks > 0 && (
-                      <span className="text-xs text-white/25">{job._count.tasks} tasks</span>
+                    {taskCount > 0 && (
+                      <span className="text-xs text-white/25">{taskCount} tasks</span>
                     )}
                   </div>
                 </div>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
       )}
 
