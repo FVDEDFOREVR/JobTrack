@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@clerk/nextjs";
 
 const features = [
@@ -26,13 +27,14 @@ export default function LandingPage() {
 
       {/* Nav */}
       <nav className="border-b border-white/[0.07] px-6 py-4 flex items-center justify-between max-w-6xl mx-auto relative">
-        <div className="flex items-center gap-2.5">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-black text-sm glow-violet-sm"
-            style={{ background: "linear-gradient(135deg, #8b5cf6, #ec4899)" }}
-          >J</div>
-          <span className="font-bold text-white text-sm tracking-tight">JobTrack</span>
-        </div>
+        <Image
+          src="/JobTrack_Logo.png"
+          alt="JobTrack"
+          width={140}
+          height={40}
+          className="object-contain"
+          priority
+        />
         <div className="flex items-center gap-3">
           {isSignedIn ? (
             <Link href="/dashboard"
