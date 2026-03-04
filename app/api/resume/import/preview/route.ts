@@ -107,7 +107,29 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     console.error("File parse error:", err);
-    return NextResponse.json({ error: "Failed to extract text from file" }, { status: 422 });
+    return NextResponse.json({
+      data: {
+        title: null,
+        fullName: null,
+        email: null,
+        phone: null,
+        location: null,
+        linkedinUrl: null,
+        portfolioUrl: null,
+        summary: null,
+        rawText: "",
+        workExperiences: [],
+        educations: [],
+        skills: [],
+      },
+      warnings: [
+        {
+          field: "rawText",
+          message: "Could not extract readable text. You can still save the original file.",
+        },
+      ],
+      rawText: "",
+    });
   }
 
   text = normalizeResumeText(text);
