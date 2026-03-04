@@ -59,20 +59,20 @@ export default function PipelinePage() {
   if (loading) return <div className="p-8 text-white/25">Loading...</div>;
 
   return (
-    <div className="p-8 h-full flex flex-col">
+    <div className="p-8 h-full flex flex-col min-w-0 overflow-hidden">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white tracking-tight">Pipeline</h1>
         <p className="text-white/35 text-sm mt-1">Drag cards to update status</p>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-4 flex-1">
+      <div className="flex gap-4 pb-4 flex-1">
         {STAGES.map((stage) => {
           const stageJobs = jobsByStatus(stage.key);
           const isOver = dragOver === stage.key;
           return (
             <div
               key={stage.key}
-              className={`flex flex-col w-64 shrink-0 rounded-2xl border transition-all ${
+              className={`flex flex-col flex-1 min-w-0 rounded-2xl border transition-all ${
                 isOver
                   ? "border-violet-500/50 bg-violet-500/[0.06]"
                   : "border-white/[0.07] bg-[#0c0a1a]"
@@ -103,8 +103,8 @@ export default function PipelinePage() {
                     }`}
                   >
                     <Link href={`/jobs/${job.id}`} onClick={(e) => dragging && e.preventDefault()}>
-                      <p className="text-sm font-semibold text-white/85 mb-1 leading-tight">{job.title}</p>
-                      <p className="text-xs text-white/40 mb-2">{job.companyName}</p>
+                      <p className="text-sm font-semibold text-white/85 mb-1 leading-tight truncate">{job.title}</p>
+                      <p className="text-xs text-white/40 mb-2 truncate">{job.companyName}</p>
                       <div className="flex items-center justify-between">
                         {formatSalary(job.salaryMin, job.salaryMax) ? (
                           <span className="text-xs text-emerald-400/80 font-medium">{formatSalary(job.salaryMin, job.salaryMax)}</span>
