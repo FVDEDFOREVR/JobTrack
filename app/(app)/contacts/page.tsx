@@ -2,6 +2,25 @@
 
 import { useEffect, useState, useCallback } from "react";
 
+interface ContactJobLink {
+  job: {
+    title: string;
+    companyName: string;
+  };
+}
+
+interface ContactItem {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  role: string | null;
+  companyName: string | null;
+  linkedIn: string | null;
+  notes: string | null;
+  jobs?: ContactJobLink[];
+}
+
 function AddContactModal({ onClose, onSaved }: { onClose: () => void; onSaved: () => void }) {
   const [form, setForm] = useState({ name: "", email: "", phone: "", role: "", companyName: "", linkedIn: "", notes: "" });
   const [saving, setSaving] = useState(false);
@@ -75,19 +94,43 @@ function AddContactModal({ onClose, onSaved }: { onClose: () => void; onSaved: (
 }
 
 export default function ContactsPage() {
-  const [contacts, setContacts] = useState<any[]>([]);
+  const [contacts, setContacts] = useState<ContactItem[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showAdd, setShowAdd] = useState(false);
 
   const fetchContacts = useCallback(async () => {
     setLoading(true);
-    const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    const res = await fetch(`/api/contacts?${params}`);
-    const data = await res.json();
-    setContacts(data);
-    setLoading(false);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      const res = await fetch(`/api/contacts?${params}`);
+
+      if (!res.ok) {
+        const text = await res.text();
+        let message = "Failed to load contacts";
+        if (text) {
+          try {
+            const parsed = JSON.parse(text);
+            if (parsed?.error) message = parsed.error;
+          } catch {
+            // Ignore non-JSON responses and keep fallback message.
+          }
+        }
+        throw new Error(message);
+      }
+
+      const data = await res.json();
+      setContacts(Array.isArray(data) ? data : []);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load contacts";
+      setError(message);
+      setContacts([]);
+    } finally {
+      setLoading(false);
+    }
   }, [search]);
 
   useEffect(() => {
@@ -103,6 +146,11 @@ export default function ContactsPage() {
 
   return (
     <div className="p-8">
+      {error && (
+        <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {error}
+        </div>
+      )}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Contacts</h1>
@@ -172,7 +220,7 @@ export default function ContactsPage() {
 
                   {contact.jobs?.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1">
-                      {contact.jobs.slice(0, 3).map((cj: any) => (
+                      {contact.jobs.slice(0, 3).map((cj: ContactJobLink) => (
                         <span key={cj.job.title} className="text-xs px-1.5 py-0.5 bg-white/[0.06] rounded-full text-white/35 font-medium">
                           {cj.job.companyName}
                         </span>

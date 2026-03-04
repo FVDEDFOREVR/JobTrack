@@ -5,6 +5,22 @@ import Link from "next/link";
 import StatusBadge from "@/components/StatusBadge";
 import { useModal } from "@/contexts/ModalContext";
 
+interface JobListItem {
+  id: string;
+  title: string;
+  companyName: string;
+  status: string;
+  location: string | null;
+  locationType: string | null;
+  salaryMin: number | null;
+  salaryMax: number | null;
+  dateApplied: string | null;
+  _count?: {
+    activities?: number;
+    tasks?: number;
+  };
+}
+
 const STATUSES = ["", "bookmarked", "applied", "phone_screen", "interview", "offer", "rejected", "withdrawn"];
 const STATUS_LABELS: Record<string, string> = {
   "": "All",
@@ -37,21 +53,45 @@ function formatDate(d: string | null) {
 }
 
 export default function JobsPage() {
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<JobListItem[]>([]);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { openAddApplicationModal } = useModal();
 
   const fetchJobs = useCallback(async () => {
     setLoading(true);
-    const params = new URLSearchParams();
-    if (search) params.set("search", search);
-    if (status) params.set("status", status);
-    const res = await fetch(`/api/jobs?${params}`);
-    const data = await res.json();
-    setJobs(data);
-    setLoading(false);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (status) params.set("status", status);
+
+      const res = await fetch(`/api/jobs?${params}`);
+      if (!res.ok) {
+        const text = await res.text();
+        let message = "Failed to load jobs";
+        if (text) {
+          try {
+            const parsed = JSON.parse(text);
+            if (parsed?.error) message = parsed.error;
+          } catch {
+            // Ignore non-JSON responses and use fallback message.
+          }
+        }
+        throw new Error(message);
+      }
+
+      const data = await res.json();
+      setJobs(Array.isArray(data) ? data : []);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load jobs";
+      setError(message);
+      setJobs([]);
+    } finally {
+      setLoading(false);
+    }
   }, [search, status]);
 
   useEffect(() => {
@@ -113,6 +153,11 @@ export default function JobsPage() {
       {/* Jobs List */}
       {loading ? (
         <div className="text-center py-16 text-white/20">Loading...</div>
+      ) : error ? (
+        <div className="text-center py-16">
+          <p className="text-red-300/90 text-lg mb-2">Couldn&apos;t load applications</p>
+          <p className="text-white/35 text-sm">{error}</p>
+        </div>
       ) : jobs.length === 0 ? (
         <div className="text-center py-16">
           <p className="text-white/35 text-lg mb-2">No applications found</p>

@@ -3,6 +3,18 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 
+interface TaskItem {
+  id: string;
+  title: string;
+  done: boolean;
+  dueDate: string | null;
+  job?: {
+    id?: string | null;
+    companyName: string;
+    title: string;
+  } | null;
+}
+
 function formatDate(d: string | null) {
   if (!d) return null;
   return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" });
@@ -21,24 +33,50 @@ function isDueToday(d: string | null) {
 }
 
 export default function TasksPage() {
-  const [tasks, setTasks] = useState<any[]>([]);
+  const [tasks, setTasks] = useState<TaskItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | "pending" | "done">("pending");
   const [newTask, setNewTask] = useState({ title: "", dueDate: "" });
   const [adding, setAdding] = useState(false);
 
   const fetchTasks = useCallback(async () => {
     setLoading(true);
-    const params = new URLSearchParams();
-    if (filter === "pending") params.set("done", "false");
-    if (filter === "done") params.set("done", "true");
-    const res = await fetch(`/api/tasks?${params}`);
-    const data = await res.json();
-    setTasks(data);
-    setLoading(false);
+    setError(null);
+    try {
+      const params = new URLSearchParams();
+      if (filter === "pending") params.set("done", "false");
+      if (filter === "done") params.set("done", "true");
+      const res = await fetch(`/api/tasks?${params}`);
+
+      if (!res.ok) {
+        const text = await res.text();
+        let message = "Failed to load tasks";
+        if (text) {
+          try {
+            const parsed = JSON.parse(text);
+            if (parsed?.error) message = parsed.error;
+          } catch {
+            // Ignore non-JSON responses and keep fallback message.
+          }
+        }
+        throw new Error(message);
+      }
+
+      const data = await res.json();
+      setTasks(Array.isArray(data) ? data : []);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load tasks";
+      setError(message);
+      setTasks([]);
+    } finally {
+      setLoading(false);
+    }
   }, [filter]);
 
-  useEffect(() => { fetchTasks(); }, [fetchTasks]);
+  useEffect(() => {
+    fetchTasks();
+  }, [fetchTasks]);
 
   const toggleTask = async (id: string, done: boolean) => {
     await fetch(`/api/tasks/${id}`, {
@@ -73,6 +111,11 @@ export default function TasksPage() {
 
   return (
     <div className="p-8">
+      {error && (
+        <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {error}
+        </div>
+      )}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white tracking-tight">Tasks</h1>
         <p className="text-white/35 text-sm mt-1">

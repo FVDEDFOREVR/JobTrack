@@ -4,6 +4,16 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useModal } from "@/contexts/ModalContext";
 
+interface PipelineJob {
+  id: string;
+  title: string;
+  companyName: string;
+  status: string;
+  salaryMin: number | null;
+  salaryMax: number | null;
+  locationType: string | null;
+}
+
 const STAGES = [
   { key: "bookmarked",   label: "Bookmarked",   dot: "bg-white/40" },
   { key: "applied",      label: "Applied",       dot: "bg-blue-500" },
@@ -22,17 +32,39 @@ function formatSalary(min?: number | null, max?: number | null) {
 }
 
 export default function PipelinePage() {
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<PipelineJob[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [dragging, setDragging] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState<string | null>(null);
   const { openAddApplicationModal } = useModal();
 
   const fetchJobs = async () => {
-    const res = await fetch("/api/jobs");
-    const data = await res.json();
-    setJobs(data);
-    setLoading(false);
+    setError(null);
+    try {
+      const res = await fetch("/api/jobs");
+      if (!res.ok) {
+        const text = await res.text();
+        let message = "Failed to load pipeline";
+        if (text) {
+          try {
+            const parsed = JSON.parse(text);
+            if (parsed?.error) message = parsed.error;
+          } catch {
+            // Ignore non-JSON responses and keep fallback message.
+          }
+        }
+        throw new Error(message);
+      }
+      const data = await res.json();
+      setJobs(Array.isArray(data) ? data : []);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Failed to load pipeline";
+      setError(message);
+      setJobs([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -49,18 +81,26 @@ export default function PipelinePage() {
     const job = jobs.find((j) => j.id === dragging);
     if (!job || job.status === status) { setDragging(null); setDragOver(null); return; }
 
+    const previousJobs = jobs;
     setJobs((prev) => prev.map((j) => j.id === dragging ? { ...j, status } : j));
     setDragging(null);
     setDragOver(null);
 
-    await fetch(`/api/jobs/${dragging}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
+    try {
+      const res = await fetch(`/api/jobs/${dragging}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update job status");
+    } catch {
+      setJobs(previousJobs);
+      setError("Could not update status. Please try again.");
+    }
   };
 
-  const jobsByStatus = (status: string) => jobs.filter((j) => j.status === status);
+  const jobsByStatus = (status: string) => (Array.isArray(jobs) ? jobs : []).filter((j) => j.status === status);
 
   if (loading) return <div className="p-8 text-white/25">Loading...</div>;
 
@@ -68,6 +108,11 @@ export default function PipelinePage() {
 
   return (
     <div className="p-8 h-full flex flex-col min-w-0 overflow-hidden">
+      {error && (
+        <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          {error}
+        </div>
+      )}
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white tracking-tight">Pipeline</h1>
         <p className="text-white/35 text-sm mt-1">Drag cards to update status</p>
