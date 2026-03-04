@@ -51,6 +51,7 @@ export default function AddJobModal({ onClose, onSaved }: { onClose: () => void;
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-3">
           <div className="grid grid-cols-2 gap-3">
+            {/* 1. Job Title */}
             <div className="col-span-2">
               <label className="block text-xs text-white/35 mb-1.5 font-medium">Job Title *</label>
               <input
@@ -61,6 +62,7 @@ export default function AddJobModal({ onClose, onSaved }: { onClose: () => void;
                 className={inputClass}
               />
             </div>
+            {/* 2. Company */}
             <div className="col-span-2">
               <label className="block text-xs text-white/35 mb-1.5 font-medium">Company *</label>
               <input
@@ -71,15 +73,7 @@ export default function AddJobModal({ onClose, onSaved }: { onClose: () => void;
                 className={inputClass}
               />
             </div>
-            <div className="col-span-2">
-              <label className="block text-xs text-white/35 mb-1.5 font-medium">Job URL</label>
-              <input
-                value={form.url}
-                onChange={(e) => setForm({ ...form, url: e.target.value })}
-                placeholder="https://..."
-                className={inputClass}
-              />
-            </div>
+            {/* 3. Status */}
             <div>
               <label className="block text-xs text-white/35 mb-1.5 font-medium">Status</label>
               <select
@@ -90,6 +84,17 @@ export default function AddJobModal({ onClose, onSaved }: { onClose: () => void;
                 {STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
             </div>
+            {/* 4. Date Applied */}
+            <div>
+              <label className="block text-xs text-white/35 mb-1.5 font-medium">Date Applied</label>
+              <input
+                type="date"
+                value={form.dateApplied}
+                onChange={(e) => setForm({ ...form, dateApplied: e.target.value })}
+                className={inputClass}
+              />
+            </div>
+            {/* 5. Work Type */}
             <div>
               <label className="block text-xs text-white/35 mb-1.5 font-medium">Work Type</label>
               <select
@@ -99,10 +104,11 @@ export default function AddJobModal({ onClose, onSaved }: { onClose: () => void;
               >
                 <option value="remote">Remote</option>
                 <option value="hybrid">Hybrid</option>
-                <option value="onsite">Onsite</option>
+                <option value="onsite">On-site</option>
               </select>
             </div>
-            <div className="col-span-2">
+            {/* 6. Location */}
+            <div>
               <label className="block text-xs text-white/35 mb-1.5 font-medium">Location</label>
               <input
                 value={form.location}
@@ -111,6 +117,17 @@ export default function AddJobModal({ onClose, onSaved }: { onClose: () => void;
                 className={inputClass}
               />
             </div>
+            {/* 7. Job URL */}
+            <div className="col-span-2">
+              <label className="block text-xs text-white/35 mb-1.5 font-medium">Job URL</label>
+              <input
+                value={form.url}
+                onChange={(e) => setForm({ ...form, url: e.target.value })}
+                placeholder="https://..."
+                className={inputClass}
+              />
+            </div>
+            {/* 8. Salary Min / 9. Salary Max */}
             <div>
               <label className="block text-xs text-white/35 mb-1.5 font-medium">Salary Min</label>
               <input
@@ -131,15 +148,7 @@ export default function AddJobModal({ onClose, onSaved }: { onClose: () => void;
                 className={inputClass}
               />
             </div>
-            <div>
-              <label className="block text-xs text-white/35 mb-1.5 font-medium">Date Applied</label>
-              <input
-                type="date"
-                value={form.dateApplied}
-                onChange={(e) => setForm({ ...form, dateApplied: e.target.value })}
-                className={inputClass}
-              />
-            </div>
+            {/* 10. Notes */}
             <div className="col-span-2">
               <label className="block text-xs text-white/35 mb-1.5 font-medium">Notes</label>
               <textarea
