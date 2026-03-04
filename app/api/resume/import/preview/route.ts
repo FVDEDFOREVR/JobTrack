@@ -44,12 +44,7 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     data: EMPTY_DRAFT,
-    warnings: [
-      {
-        field: "rawText",
-        message: "Text extraction is optional. You can preview and save the original file directly.",
-      },
-    ],
+    warnings: [],
     rawText: "",
   });
 }
