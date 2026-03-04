@@ -182,8 +182,13 @@ export default function ContactsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {contacts.map((contact) => (
-            <div key={contact.id} className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4 hover:border-violet-500/30 transition-all">
+          {contacts.map((contact) => {
+            const contactJobs = contact.jobs ?? [];
+            return (
+            <div
+              key={contact.id}
+              className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4 hover:border-violet-500/30 transition-all"
+            >
               <div className="flex items-start gap-3">
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm shrink-0"
@@ -218,9 +223,9 @@ export default function ContactsPage() {
                     <p className="text-xs text-white/25 mt-2 line-clamp-2">{contact.notes}</p>
                   )}
 
-                  {contact.jobs?.length > 0 && (
+                  {contactJobs.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1">
-                      {contact.jobs.slice(0, 3).map((cj: ContactJobLink) => (
+                      {contactJobs.slice(0, 3).map((cj: ContactJobLink) => (
                         <span key={cj.job.title} className="text-xs px-1.5 py-0.5 bg-white/[0.06] rounded-full text-white/35 font-medium">
                           {cj.job.companyName}
                         </span>
@@ -230,7 +235,8 @@ export default function ContactsPage() {
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

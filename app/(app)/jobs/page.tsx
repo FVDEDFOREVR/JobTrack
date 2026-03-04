@@ -165,7 +165,10 @@ export default function JobsPage() {
         </div>
       ) : (
         <div className="space-y-2">
-          {jobs.map((job) => (
+          {jobs.map((job) => {
+            const activityCount = job._count?.activities ?? 0;
+            const taskCount = job._count?.tasks ?? 0;
+            return (
             <Link
               key={job.id}
               href={`/jobs/${job.id}`}
@@ -202,17 +205,18 @@ export default function JobsPage() {
                     <p className="text-xs text-white/25">Applied {formatDate(job.dateApplied)}</p>
                   )}
                   <div className="flex items-center gap-2 mt-1 justify-end">
-                    {job._count?.activities > 0 && (
-                      <span className="text-xs text-white/25">{job._count.activities} activities</span>
+                    {activityCount > 0 && (
+                      <span className="text-xs text-white/25">{activityCount} activities</span>
                     )}
-                    {job._count?.tasks > 0 && (
-                      <span className="text-xs text-white/25">{job._count.tasks} tasks</span>
+                    {taskCount > 0 && (
+                      <span className="text-xs text-white/25">{taskCount} tasks</span>
                     )}
                   </div>
                 </div>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
       )}
 

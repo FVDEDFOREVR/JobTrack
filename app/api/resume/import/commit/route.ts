@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     let sourceFileName: string | null = null;
     let sourceFileType: string | null = null;
     let sourceFileSize: number | null = null;
-    let sourceFileData: Buffer | null = null;
+    let sourceFileData: Uint8Array<ArrayBuffer> | null = null;
 
     if (contentType.includes("multipart/form-data")) {
       let form: FormData;
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
         sourceFileName = file.name || null;
         sourceFileType = file.type || "application/octet-stream";
         sourceFileSize = file.size ?? null;
-        sourceFileData = Buffer.from(await file.arrayBuffer());
+        sourceFileData = new Uint8Array(await file.arrayBuffer());
       }
     } else {
       try {
