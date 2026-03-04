@@ -73,52 +73,93 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Empty state */}
+      {/* Empty state onboarding */}
       {isEmpty && (
-        <div className="bg-white/[0.04] border border-violet-500/20 rounded-2xl p-10 mb-8 text-center">
-          <div className="text-4xl mb-4 text-violet-400">◈</div>
-          <h2 className="text-xl font-bold text-white mb-2 tracking-tight">Add your first application</h2>
-          <p className="text-white/40 text-sm mb-6 max-w-sm mx-auto">
-            Start tracking roles you've applied to. Your pipeline, tasks, and activity log update automatically.
-          </p>
-          <Link href="/jobs"
-            className="inline-block px-6 py-3 text-white font-semibold rounded-xl transition-all glow-btn"
-            style={{ background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" }}>
-            + Add Your First Application
-          </Link>
+        <div className="bg-white/[0.04] border border-violet-500/20 rounded-2xl p-10 mb-8"
+          style={{ boxShadow: "0 0 60px rgba(139,92,246,0.08)" }}>
+          <div className="max-w-lg mx-auto">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-xs font-bold text-violet-400 uppercase tracking-widest px-2.5 py-1 rounded-full border border-violet-500/30"
+                style={{ background: "rgba(139,92,246,0.12)" }}>Step 1</span>
+            </div>
+            <h2 className="text-xl font-bold text-white mb-2 tracking-tight">Add a job you're tracking</h2>
+            <p className="text-white/40 text-sm mb-6 leading-relaxed">
+              Start with a role you've already applied to. Once added, JobTrack will automatically track your pipeline, tasks, and activity.
+            </p>
+            <div className="bg-white/[0.04] border border-white/[0.08] rounded-xl p-4 mb-6 flex flex-col gap-2">
+              <p className="text-[10px] text-white/25 uppercase tracking-widest font-semibold mb-1">Example</p>
+              {[["Company", "Stripe"], ["Role", "Frontend Engineer"], ["Status", "Applied"]].map(([k, v]) => (
+                <div key={k} className="flex items-center gap-3">
+                  <span className="text-xs text-white/30 w-16 shrink-0">{k}</span>
+                  <span className="text-sm text-white/60 font-medium">{v}</span>
+                </div>
+              ))}
+            </div>
+            <Link href="/jobs"
+              className="inline-block px-6 py-3 text-white font-semibold rounded-xl transition-all glow-btn"
+              style={{ background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" }}>
+              Add your first application →
+            </Link>
+          </div>
         </div>
       )}
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {[
-          { label: "Total Applications", value: totalJobs,        sub: "all time",         color: "text-white",        glow: "rgba(255,255,255,0.08)" },
-          { label: "Active Processes",   value: activeCount,      sub: "in progress",      color: "text-violet-400",   glow: "rgba(139,92,246,0.15)" },
-          { label: "Offers",             value: offerCount,       sub: "received",         color: "text-emerald-400",  glow: "rgba(52,211,153,0.15)" },
-          { label: "Response Rate",      value: `${responseRate}%`, sub: "of applications", color: "text-blue-400",   glow: "rgba(96,165,250,0.15)" },
-        ].map((card) => (
-          <div key={card.label}
-            className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 transition-colors hover:border-white/[0.14]"
-            style={{ boxShadow: `0 0 40px ${card.glow}` }}>
-            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-3 font-semibold">{card.label}</p>
-            <p className={`text-3xl font-black tracking-tighter ${card.color}`}>{card.value}</p>
-            <p className="text-xs text-white/25 mt-1">{card.sub}</p>
-          </div>
-        ))}
+        {isEmpty ? (
+          <>
+            {[
+              { label: "Total Applications", hint: "Add your first job to start tracking",           glow: "rgba(255,255,255,0.08)" },
+              { label: "Active Processes",   hint: "Starts once you move a job into interview stages", glow: "rgba(139,92,246,0.15)" },
+              { label: "Offers",             hint: "Appears when you receive an offer",               glow: "rgba(52,211,153,0.15)" },
+              { label: "Response Rate",      hint: "Appears after your first application",            glow: "rgba(96,165,250,0.15)" },
+            ].map((card) => (
+              <div key={card.label}
+                className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5"
+                style={{ boxShadow: `0 0 40px ${card.glow}` }}>
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-3 font-semibold">{card.label}</p>
+                <p className="text-sm text-white/20 leading-snug">{card.hint}</p>
+              </div>
+            ))}
+          </>
+        ) : (
+          <>
+            {[
+              { label: "Total Applications", value: totalJobs,          sub: "all time",         color: "text-white",       glow: "rgba(255,255,255,0.08)" },
+              { label: "Active Processes",   value: activeCount,        sub: "in progress",      color: "text-violet-400",  glow: "rgba(139,92,246,0.15)" },
+              { label: "Offers",             value: offerCount,         sub: "received",         color: "text-emerald-400", glow: "rgba(52,211,153,0.15)" },
+              { label: "Response Rate",      value: `${responseRate}%`, sub: "of applications",  color: "text-blue-400",    glow: "rgba(96,165,250,0.15)" },
+            ].map((card) => (
+              <div key={card.label}
+                className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 transition-colors hover:border-white/[0.14]"
+                style={{ boxShadow: `0 0 40px ${card.glow}` }}>
+                <p className="text-[10px] text-white/30 uppercase tracking-widest mb-3 font-semibold">{card.label}</p>
+                <p className={`text-3xl font-black tracking-tighter ${card.color}`}>{card.value}</p>
+                <p className="text-xs text-white/25 mt-1">{card.sub}</p>
+              </div>
+            ))}
+          </>
+        )}
       </div>
 
       {/* Pipeline Overview */}
       <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 mb-6">
         <h2 className="text-sm font-semibold text-white/70 mb-4">Pipeline Overview</h2>
-        <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-          {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
-            <Link key={key} href={`/jobs?status=${key}`}
-              className="flex flex-col items-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] transition-colors border border-white/[0.07] hover:border-violet-500/30">
-              <span className={`text-xl font-black tracking-tighter ${cfg.color}`}>{statusMap[key] || 0}</span>
-              <span className="text-[10px] text-white/30 mt-1 text-center leading-tight font-medium">{cfg.label}</span>
-            </Link>
-          ))}
-        </div>
+        {isEmpty ? (
+          <p className="text-white/20 text-sm text-center py-4">
+            Your pipeline will appear here after you add your first application.
+          </p>
+        ) : (
+          <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+            {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+              <Link key={key} href={`/jobs?status=${key}`}
+                className="flex flex-col items-center p-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.07] transition-colors border border-white/[0.07] hover:border-violet-500/30">
+                <span className={`text-xl font-black tracking-tighter ${cfg.color}`}>{statusMap[key] || 0}</span>
+                <span className="text-[10px] text-white/30 mt-1 text-center leading-tight font-medium">{cfg.label}</span>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
