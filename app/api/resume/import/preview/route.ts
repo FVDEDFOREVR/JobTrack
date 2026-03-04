@@ -113,7 +113,29 @@ export async function POST(req: NextRequest) {
   text = normalizeResumeText(text);
 
   if (!text.trim()) {
-    return NextResponse.json({ error: "No readable text found in file" }, { status: 422 });
+    return NextResponse.json({
+      data: {
+        title: null,
+        fullName: null,
+        email: null,
+        phone: null,
+        location: null,
+        linkedinUrl: null,
+        portfolioUrl: null,
+        summary: null,
+        rawText: "",
+        workExperiences: [],
+        educations: [],
+        skills: [],
+      },
+      warnings: [
+        {
+          field: "rawText",
+          message: "No readable text detected. You can still save the original file.",
+        },
+      ],
+      rawText: "",
+    });
   }
 
   // Parse structured data — never store raw text
