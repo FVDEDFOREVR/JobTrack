@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import StatusBadge from "@/components/StatusBadge";
-import AddJobModal from "@/components/AddJobModal";
+import { useModal } from "@/contexts/ModalContext";
 
 const STATUSES = ["", "bookmarked", "applied", "phone_screen", "interview", "offer", "rejected", "withdrawn"];
 const STATUS_LABELS: Record<string, string> = {
@@ -41,7 +41,7 @@ export default function JobsPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
-  const [showAdd, setShowAdd] = useState(false);
+  const { openAddApplicationModal } = useModal();
 
   const fetchJobs = useCallback(async () => {
     setLoading(true);
@@ -59,6 +59,11 @@ export default function JobsPage() {
     return () => clearTimeout(t);
   }, [fetchJobs]);
 
+  useEffect(() => {
+    window.addEventListener("job-added", fetchJobs);
+    return () => window.removeEventListener("job-added", fetchJobs);
+  }, [fetchJobs]);
+
   return (
     <div className="p-8">
       {/* Header */}
@@ -68,7 +73,7 @@ export default function JobsPage() {
           <p className="text-white/35 text-sm mt-1">{jobs.length} job{jobs.length !== 1 ? "s" : ""} tracked</p>
         </div>
         <button
-          onClick={() => setShowAdd(true)}
+          onClick={openAddApplicationModal}
           className="px-4 py-2.5 text-white text-sm font-semibold rounded-xl transition-all glow-btn"
           style={{ background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" }}
         >
@@ -166,12 +171,7 @@ export default function JobsPage() {
         </div>
       )}
 
-      {showAdd && (
-        <AddJobModal
-          onClose={() => setShowAdd(false)}
-          onSaved={() => { setShowAdd(false); fetchJobs(); }}
-        />
-      )}
+
     </div>
   );
 }

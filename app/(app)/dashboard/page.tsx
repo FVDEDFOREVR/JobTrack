@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useModal } from "@/contexts/ModalContext";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   bookmarked:   { label: "Bookmarked",   color: "text-white/45" },
@@ -35,9 +36,15 @@ function formatRelative(d: string) {
 
 export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
+  const { openAddApplicationModal } = useModal();
+
+  const fetchStats = () => fetch("/api/stats").then((r) => r.json()).then(setData);
 
   useEffect(() => {
-    fetch("/api/stats").then((r) => r.json()).then(setData);
+    fetchStats();
+    // Refresh stats when a job is added via the global modal
+    window.addEventListener("job-added", fetchStats);
+    return () => window.removeEventListener("job-added", fetchStats);
   }, []);
 
   if (!data) return <div className="p-8 text-white/25">Loading...</div>;
@@ -66,11 +73,12 @@ export default function DashboardPage() {
           />
           <p className="text-white/35 text-sm mt-1">Your job search at a glance</p>
         </div>
-        <Link href="/jobs"
+        <button
+          onClick={openAddApplicationModal}
           className="px-4 py-2.5 text-white text-sm font-semibold rounded-xl transition-all glow-btn"
           style={{ background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" }}>
           + Add Application
-        </Link>
+        </button>
       </div>
 
       {/* Empty state onboarding */}
@@ -95,11 +103,12 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-            <Link href="/jobs"
-              className="inline-block px-6 py-3 text-white font-semibold rounded-xl transition-all glow-btn"
+            <button
+              onClick={openAddApplicationModal}
+              className="px-6 py-3 text-white font-semibold rounded-xl transition-all glow-btn"
               style={{ background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" }}>
               Add your first application →
-            </Link>
+            </button>
           </div>
         </div>
       )}

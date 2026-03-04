@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useModal } from "@/contexts/ModalContext";
 
 const STAGES = [
   { key: "bookmarked",   label: "Bookmarked",   dot: "bg-white/40" },
@@ -25,6 +26,7 @@ export default function PipelinePage() {
   const [loading, setLoading] = useState(true);
   const [dragging, setDragging] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState<string | null>(null);
+  const { openAddApplicationModal } = useModal();
 
   const fetchJobs = async () => {
     const res = await fetch("/api/jobs");
@@ -33,7 +35,11 @@ export default function PipelinePage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchJobs(); }, []);
+  useEffect(() => {
+    fetchJobs();
+    window.addEventListener("job-added", fetchJobs);
+    return () => window.removeEventListener("job-added", fetchJobs);
+  }, []);
 
   const handleDragStart = (jobId: string) => setDragging(jobId);
   const handleDragEnd = () => { setDragging(null); setDragOver(null); };
@@ -77,11 +83,12 @@ export default function PipelinePage() {
             <p className="text-white/40 text-sm mb-6 leading-relaxed">
               Add your first application and move it through the hiring stages. Drag cards between columns to update status.
             </p>
-            <a href="/jobs"
-              className="inline-block px-6 py-3 text-white font-semibold rounded-xl transition-all glow-btn"
+            <button
+              onClick={openAddApplicationModal}
+              className="px-6 py-3 text-white font-semibold rounded-xl transition-all glow-btn"
               style={{ background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" }}>
               Add your first application →
-            </a>
+            </button>
           </div>
         </div>
       )}
