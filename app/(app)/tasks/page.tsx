@@ -72,34 +72,35 @@ export default function TasksPage() {
   const overdueCount = tasks.filter((t) => !t.done && isOverdue(t.dueDate)).length;
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
+    <div className="p-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-white">Tasks</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <h1 className="text-2xl font-bold text-white tracking-tight">Tasks</h1>
+        <p className="text-white/35 text-sm mt-1">
           {pendingCount} pending
-          {overdueCount > 0 && <span className="text-red-400 ml-2">· {overdueCount} overdue</span>}
+          {overdueCount > 0 && <span className="text-red-400 ml-2 font-medium">· {overdueCount} overdue</span>}
         </p>
       </div>
 
       {/* Add Task */}
-      <form onSubmit={addTask} className="bg-[#1a1a1a] border border-white/5 rounded-xl p-4 mb-6">
+      <form onSubmit={addTask} className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4 mb-6">
         <div className="flex gap-2">
           <input
             value={newTask.title}
             onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
             placeholder="Add a task..."
-            className="flex-1 bg-[#111] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-violet-500/50"
+            className="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-3 py-2.5 text-sm text-white/80 placeholder-white/25 focus:outline-none focus:border-violet-500/50 transition-colors"
           />
           <input
             type="date"
             value={newTask.dueDate}
             onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-            className="bg-[#111] border border-white/10 rounded-lg px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-violet-500/50"
+            className="bg-white/[0.05] border border-white/[0.1] rounded-xl px-3 py-2.5 text-sm text-white/60 focus:outline-none focus:border-violet-500/50 transition-colors"
           />
           <button
             type="submit"
             disabled={adding || !newTask.title}
-            className="px-4 py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-sm font-medium rounded-lg transition-colors"
+            className="px-4 py-2.5 disabled:opacity-40 text-white text-sm font-semibold rounded-xl transition-all glow-btn"
+            style={{ background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" }}
           >
             Add
           </button>
@@ -107,14 +108,17 @@ export default function TasksPage() {
       </form>
 
       {/* Filter Tabs */}
-      <div className="flex gap-1 mb-4 bg-[#1a1a1a] border border-white/5 rounded-xl p-1 w-fit">
+      <div className="flex gap-1 mb-5 bg-white/[0.04] border border-white/[0.07] rounded-xl p-1 w-fit">
         {(["pending", "all", "done"] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${
-              filter === f ? "bg-white/10 text-white" : "text-gray-500 hover:text-gray-300"
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all capitalize ${
+              filter === f
+                ? "text-violet-300 border border-violet-500/30"
+                : "text-white/35 hover:text-white/60"
             }`}
+            style={filter === f ? { background: "rgba(139,92,246,0.2)" } : {}}
           >
             {f === "pending" ? "Pending" : f === "done" ? "Completed" : "All"}
           </button>
@@ -123,13 +127,13 @@ export default function TasksPage() {
 
       {/* Tasks */}
       {loading ? (
-        <div className="text-center py-16 text-gray-600">Loading...</div>
+        <div className="text-center py-16 text-white/20">Loading...</div>
       ) : tasks.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-gray-500 text-lg mb-2">
+          <p className="text-white/35 text-lg mb-2">
             {filter === "done" ? "No completed tasks" : "No tasks yet"}
           </p>
-          <p className="text-gray-600 text-sm">Add tasks to stay on top of your job search</p>
+          <p className="text-white/20 text-sm">Add tasks to stay on top of your job search</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -139,37 +143,42 @@ export default function TasksPage() {
             return (
               <div
                 key={task.id}
-                className={`flex items-center gap-3 p-3.5 bg-[#1a1a1a] border rounded-xl transition-all ${
-                  task.done ? "border-white/3 opacity-50" : overdue ? "border-red-500/20" : "border-white/5"
+                className={`flex items-center gap-3 p-3.5 bg-white/[0.04] border rounded-2xl transition-all ${
+                  task.done
+                    ? "border-white/[0.04] opacity-50"
+                    : overdue
+                    ? "border-red-500/20"
+                    : "border-white/[0.08] hover:border-violet-500/25"
                 }`}
               >
                 <button
                   onClick={() => toggleTask(task.id, !task.done)}
-                  className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                  className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-all ${
                     task.done
-                      ? "bg-violet-600 border-violet-600 text-white"
-                      : "border-white/20 hover:border-violet-500"
+                      ? "border-violet-500 text-white"
+                      : "border-violet-500/40 bg-violet-500/[0.05] hover:border-violet-400"
                   }`}
+                  style={task.done ? { background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" } : {}}
                 >
                   {task.done && <span className="text-xs">✓</span>}
                 </button>
 
                 <div className="flex-1 min-w-0">
-                  <p className={`text-sm ${task.done ? "line-through text-gray-600" : "text-gray-200"}`}>
+                  <p className={`text-sm ${task.done ? "line-through text-white/25" : "text-white/80"}`}>
                     {task.title}
                   </p>
                   {task.job && (
-                    <Link href={`/jobs/${task.job.id || ""}`} className="text-xs text-gray-600 hover:text-gray-400 transition-colors">
+                    <Link href={`/jobs/${task.job.id || ""}`} className="text-xs text-white/30 hover:text-violet-400/70 transition-colors">
                       {task.job.companyName} · {task.job.title}
                     </Link>
                   )}
                 </div>
 
                 {task.dueDate && (
-                  <span className={`text-xs shrink-0 px-2 py-0.5 rounded ${
-                    overdue ? "text-red-400 bg-red-400/10" :
-                    today ? "text-yellow-400 bg-yellow-400/10" :
-                    "text-gray-600"
+                  <span className={`text-xs shrink-0 px-2 py-0.5 rounded-full font-semibold ${
+                    overdue ? "text-red-400 bg-red-400/[0.12]" :
+                    today  ? "text-yellow-400 bg-yellow-400/[0.12]" :
+                    "text-white/30"
                   }`}>
                     {overdue ? "Overdue · " : today ? "Today · " : ""}{formatDate(task.dueDate)}
                   </span>
@@ -177,7 +186,7 @@ export default function TasksPage() {
 
                 <button
                   onClick={() => deleteTask(task.id)}
-                  className="text-gray-700 hover:text-red-400 text-sm transition-colors shrink-0 ml-1"
+                  className="text-white/20 hover:text-red-400 text-sm transition-colors shrink-0 ml-1"
                 >
                   ✕
                 </button>

@@ -122,30 +122,32 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     router.push("/jobs");
   };
 
-  if (loading) return <div className="p-8 text-gray-600">Loading...</div>;
-  if (!job) return <div className="p-8 text-gray-600">Job not found</div>;
+  if (loading) return <div className="p-8 text-white/20">Loading...</div>;
+  if (!job) return <div className="p-8 text-white/20">Job not found</div>;
+
+  const inputClass = "bg-white/[0.05] border border-white/[0.1] rounded-xl px-3 py-2 text-sm text-white/80 placeholder-white/25 focus:outline-none focus:border-violet-500/50 transition-colors";
 
   return (
     <div className="p-8 max-w-5xl mx-auto">
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-sm text-gray-600 mb-6">
-        <Link href="/jobs" className="hover:text-gray-400">Applications</Link>
+      <div className="flex items-center gap-2 text-sm text-white/30 mb-6">
+        <Link href="/jobs" className="hover:text-violet-400 transition-colors">Applications</Link>
         <span>/</span>
-        <span className="text-gray-400">{job.companyName}</span>
+        <span className="text-white/50">{job.companyName}</span>
       </div>
 
       {/* Header */}
       <div className="flex items-start justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-white mb-2">{job.title}</h1>
+          <h1 className="text-2xl font-black text-white tracking-tight mb-2">{job.title}</h1>
           <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-gray-400 font-medium">{job.companyName}</span>
-            {job.location && <span className="text-gray-600 text-sm">{job.location}</span>}
+            <span className="text-white/60 font-semibold">{job.companyName}</span>
+            {job.location && <span className="text-white/35 text-sm">{job.location}</span>}
             {job.locationType && (
-              <span className="text-xs px-2 py-0.5 bg-white/5 rounded text-gray-500 capitalize">{job.locationType}</span>
+              <span className="text-xs px-2 py-0.5 bg-white/[0.06] border border-white/[0.08] rounded-full text-white/40 capitalize">{job.locationType}</span>
             )}
             {formatSalary(job.salaryMin, job.salaryMax) && (
-              <span className="text-emerald-500/80 text-sm">{formatSalary(job.salaryMin, job.salaryMax)}</span>
+              <span className="text-emerald-400/80 text-sm font-medium">{formatSalary(job.salaryMin, job.salaryMax)}</span>
             )}
           </div>
         </div>
@@ -155,14 +157,14 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
               href={job.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-2 bg-white/5 hover:bg-white/10 text-gray-400 text-sm rounded-lg transition-colors"
+              className="px-3 py-2 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-white/50 hover:text-white/75 text-sm rounded-xl transition-all"
             >
               View Job ↗
             </a>
           )}
           <button
             onClick={deleteJob}
-            className="px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm rounded-lg transition-colors"
+            className="px-3 py-2 bg-red-500/[0.08] hover:bg-red-500/[0.15] border border-red-500/20 text-red-400 text-sm rounded-xl transition-all"
           >
             Delete
           </button>
@@ -170,17 +172,17 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
       </div>
 
       {/* Status + Meta */}
-      <div className="bg-[#1a1a1a] border border-white/5 rounded-xl p-5 mb-6">
+      <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 mb-5">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
-            <p className="text-xs text-gray-600 mb-1.5">Status</p>
+            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 font-semibold">Status</p>
             {editingStatus ? (
               <select
                 autoFocus
                 value={job.status}
                 onChange={(e) => updateStatus(e.target.value)}
                 onBlur={() => setEditingStatus(false)}
-                className="bg-[#111] border border-violet-500/50 rounded px-2 py-1 text-sm text-gray-200 focus:outline-none"
+                className="bg-white/[0.05] border border-violet-500/50 rounded-lg px-2 py-1 text-sm text-white/80 focus:outline-none"
               >
                 {STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
@@ -191,37 +193,40 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             )}
           </div>
           <div>
-            <p className="text-xs text-gray-600 mb-1.5">Date Applied</p>
-            <p className="text-sm text-gray-300">{formatDate(job.dateApplied)}</p>
+            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 font-semibold">Date Applied</p>
+            <p className="text-sm text-white/60">{formatDate(job.dateApplied)}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-600 mb-1.5">Resume Version</p>
-            <p className="text-sm text-gray-300">{job.resumeVersion || "—"}</p>
+            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 font-semibold">Resume Version</p>
+            <p className="text-sm text-white/60">{job.resumeVersion || "—"}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-600 mb-1.5">Added</p>
-            <p className="text-sm text-gray-300">{formatDate(job.createdAt)}</p>
+            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-2 font-semibold">Added</p>
+            <p className="text-sm text-white/60">{formatDate(job.createdAt)}</p>
           </div>
         </div>
       </div>
 
       {/* Contacts */}
       {job.contacts?.length > 0 && (
-        <div className="bg-[#1a1a1a] border border-white/5 rounded-xl p-5 mb-6">
-          <h3 className="text-sm font-medium text-gray-400 mb-3">Contacts</h3>
+        <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5 mb-5">
+          <h3 className="text-xs text-white/35 uppercase tracking-widest font-semibold mb-3">Contacts</h3>
           <div className="flex flex-wrap gap-3">
             {job.contacts.map((cj: any) => (
               <Link
                 key={cj.contact.id}
                 href={`/contacts`}
-                className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded-lg hover:bg-white/8 transition-colors"
+                className="flex items-center gap-2 px-3 py-2 bg-white/[0.05] border border-white/[0.08] rounded-xl hover:border-violet-500/30 transition-all"
               >
-                <div className="w-6 h-6 rounded-full bg-violet-600/30 flex items-center justify-center text-xs text-violet-300 font-medium">
+                <div
+                  className="w-6 h-6 rounded-full flex items-center justify-center text-xs text-white font-bold shrink-0"
+                  style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.5), rgba(236,72,153,0.4))" }}
+                >
                   {cj.contact.name[0]}
                 </div>
                 <div>
-                  <p className="text-sm text-gray-200">{cj.contact.name}</p>
-                  {cj.contact.role && <p className="text-xs text-gray-500">{cj.contact.role}</p>}
+                  <p className="text-sm text-white/80">{cj.contact.name}</p>
+                  {cj.contact.role && <p className="text-xs text-white/35">{cj.contact.role}</p>}
                 </div>
               </Link>
             ))}
@@ -230,21 +235,24 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
       )}
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-4 bg-[#1a1a1a] border border-white/5 rounded-xl p-1 w-fit">
+      <div className="flex gap-1 mb-5 bg-white/[0.04] border border-white/[0.07] rounded-xl p-1 w-fit">
         {(["activity", "tasks", "notes"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${
-              activeTab === tab ? "bg-white/10 text-white" : "text-gray-500 hover:text-gray-300"
+            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all capitalize ${
+              activeTab === tab
+                ? "text-violet-300 border border-violet-500/30"
+                : "text-white/35 hover:text-white/60"
             }`}
+            style={activeTab === tab ? { background: "rgba(139,92,246,0.2)" } : {}}
           >
             {tab}
             {tab === "activity" && job.activities?.length > 0 && (
-              <span className="ml-1.5 text-xs text-gray-600">({job.activities.length})</span>
+              <span className="ml-1.5 text-xs text-white/25">({job.activities.length})</span>
             )}
             {tab === "tasks" && job.tasks?.length > 0 && (
-              <span className="ml-1.5 text-xs text-gray-600">({job.tasks.length})</span>
+              <span className="ml-1.5 text-xs text-white/25">({job.tasks.length})</span>
             )}
           </button>
         ))}
@@ -254,19 +262,20 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
       {activeTab === "activity" && (
         <div className="space-y-4">
           {/* Add Activity */}
-          <form onSubmit={addActivity} className="bg-[#1a1a1a] border border-white/5 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-3">Log Activity</p>
+          <form onSubmit={addActivity} className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4">
+            <p className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-3">Log Activity</p>
             <div className="flex gap-2 mb-3 flex-wrap">
               {ACTIVITY_TYPES.map((t) => (
                 <button
                   key={t.value}
                   type="button"
                   onClick={() => setActForm({ ...actForm, type: t.value })}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     actForm.type === t.value
-                      ? "bg-violet-600 text-white"
-                      : "bg-white/5 text-gray-400 hover:text-gray-200"
+                      ? "text-violet-300 border border-violet-500/40"
+                      : "bg-white/[0.05] text-white/35 hover:text-white/65 border border-white/[0.08]"
                   }`}
+                  style={actForm.type === t.value ? { background: "rgba(139,92,246,0.2)" } : {}}
                 >
                   {t.icon} {t.label}
                 </button>
@@ -277,18 +286,19 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 value={actForm.title}
                 onChange={(e) => setActForm({ ...actForm, title: e.target.value })}
                 placeholder="What happened?"
-                className="flex-1 bg-[#111] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-violet-500/50"
+                className={`flex-1 ${inputClass}`}
               />
               <input
                 type="date"
                 value={actForm.date}
                 onChange={(e) => setActForm({ ...actForm, date: e.target.value })}
-                className="bg-[#111] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-violet-500/50"
+                className={inputClass}
               />
               <button
                 type="submit"
                 disabled={addingAct || !actForm.title}
-                className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-sm rounded-lg transition-colors"
+                className="px-4 py-2 disabled:opacity-40 text-white text-sm font-semibold rounded-xl transition-all glow-btn"
+                style={{ background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" }}
               >
                 Log
               </button>
@@ -298,28 +308,28 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
               onChange={(e) => setActForm({ ...actForm, notes: e.target.value })}
               placeholder="Notes (optional)"
               rows={2}
-              className="mt-2 w-full bg-[#111] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-violet-500/50 resize-none"
+              className={`mt-2 w-full ${inputClass} resize-none`}
             />
           </form>
 
           {/* Activity List */}
           {job.activities?.length === 0 ? (
-            <p className="text-gray-600 text-sm text-center py-6">No activity logged yet</p>
+            <p className="text-white/20 text-sm text-center py-8">No activity logged yet</p>
           ) : (
             <div className="relative">
-              <div className="absolute left-4 top-0 bottom-0 w-px bg-white/5" />
+              <div className="absolute left-4 top-0 bottom-0 w-px bg-white/[0.06]" />
               <div className="space-y-0">
                 {job.activities?.map((act: any) => (
                   <div key={act.id} className="flex gap-4 pb-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-[#1a1a1a] border border-white/10 flex items-center justify-center text-sm shrink-0 z-10">
+                    <div className="w-8 h-8 rounded-full bg-white/[0.05] border border-white/[0.1] flex items-center justify-center text-sm shrink-0 z-10 text-white/50">
                       {ACTIVITY_ICONS[act.type] || "·"}
                     </div>
-                    <div className="flex-1 bg-[#1a1a1a] border border-white/5 rounded-xl p-3 mt-0.5">
+                    <div className="flex-1 bg-white/[0.04] border border-white/[0.07] rounded-xl p-3 mt-0.5">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="text-sm font-medium text-gray-200">{act.title}</p>
-                        <span className="text-xs text-gray-600">{formatDate(act.date)}</span>
+                        <p className="text-sm font-semibold text-white/80">{act.title}</p>
+                        <span className="text-xs text-white/25">{formatDate(act.date)}</span>
                       </div>
-                      {act.notes && <p className="text-xs text-gray-500">{act.notes}</p>}
+                      {act.notes && <p className="text-xs text-white/35">{act.notes}</p>}
                     </div>
                   </div>
                 ))}
@@ -332,25 +342,26 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
       {/* Tasks Tab */}
       {activeTab === "tasks" && (
         <div className="space-y-4">
-          <form onSubmit={addTask} className="bg-[#1a1a1a] border border-white/5 rounded-xl p-4">
-            <p className="text-xs text-gray-500 mb-3">Add Task</p>
+          <form onSubmit={addTask} className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4">
+            <p className="text-xs text-white/30 uppercase tracking-widest font-semibold mb-3">Add Task</p>
             <div className="flex gap-2">
               <input
                 value={taskForm.title}
                 onChange={(e) => setTaskForm({ ...taskForm, title: e.target.value })}
                 placeholder="e.g. Send thank you email"
-                className="flex-1 bg-[#111] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-violet-500/50"
+                className={`flex-1 ${inputClass}`}
               />
               <input
                 type="date"
                 value={taskForm.dueDate}
                 onChange={(e) => setTaskForm({ ...taskForm, dueDate: e.target.value })}
-                className="bg-[#111] border border-white/10 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-violet-500/50"
+                className={inputClass}
               />
               <button
                 type="submit"
                 disabled={addingTask || !taskForm.title}
-                className="px-4 py-2 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-sm rounded-lg transition-colors"
+                className="px-4 py-2 disabled:opacity-40 text-white text-sm font-semibold rounded-xl transition-all glow-btn"
+                style={{ background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" }}
               >
                 Add
               </button>
@@ -358,7 +369,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
           </form>
 
           {job.tasks?.length === 0 ? (
-            <p className="text-gray-600 text-sm text-center py-6">No tasks yet</p>
+            <p className="text-white/20 text-sm text-center py-8">No tasks yet</p>
           ) : (
             <div className="space-y-2">
               {job.tasks?.map((task: any) => {
@@ -366,26 +377,33 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
                 return (
                   <div
                     key={task.id}
-                    className={`flex items-center gap-3 p-3 bg-[#1a1a1a] border rounded-xl transition-all ${
-                      task.done ? "border-white/3 opacity-50" : "border-white/5"
+                    className={`flex items-center gap-3 p-3.5 bg-white/[0.04] border rounded-2xl transition-all ${
+                      task.done
+                        ? "border-white/[0.04] opacity-50"
+                        : isOverdue
+                        ? "border-red-500/20"
+                        : "border-white/[0.08] hover:border-violet-500/25"
                     }`}
                   >
                     <button
                       onClick={() => toggleTask(task.id, !task.done)}
-                      className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 transition-colors ${
+                      className={`w-5 h-5 rounded-md border flex items-center justify-center shrink-0 transition-all ${
                         task.done
-                          ? "bg-violet-600 border-violet-600 text-white"
-                          : "border-white/20 hover:border-violet-500"
+                          ? "border-violet-500 text-white"
+                          : "border-violet-500/40 bg-violet-500/[0.05] hover:border-violet-400"
                       }`}
+                      style={task.done ? { background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" } : {}}
                     >
                       {task.done && <span className="text-xs">✓</span>}
                     </button>
-                    <span className={`flex-1 text-sm ${task.done ? "line-through text-gray-600" : "text-gray-200"}`}>
+                    <span className={`flex-1 text-sm ${task.done ? "line-through text-white/25" : "text-white/80"}`}>
                       {task.title}
                     </span>
                     {task.dueDate && (
-                      <span className={`text-xs ${isOverdue ? "text-red-400" : "text-gray-600"}`}>
-                        {formatDate(task.dueDate)}
+                      <span className={`text-xs shrink-0 px-2 py-0.5 rounded-full font-semibold ${
+                        isOverdue ? "text-red-400 bg-red-400/[0.12]" : "text-white/30"
+                      }`}>
+                        {isOverdue ? "Overdue · " : ""}{formatDate(task.dueDate)}
                       </span>
                     )}
                   </div>
@@ -398,7 +416,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
       {/* Notes Tab */}
       {activeTab === "notes" && (
-        <div className="bg-[#1a1a1a] border border-white/5 rounded-xl p-5">
+        <div className="bg-white/[0.04] border border-white/[0.08] rounded-2xl p-5">
           <NotesEditor jobId={id} initialNotes={job.notes || ""} onSaved={fetchJob} />
         </div>
       )}
@@ -427,11 +445,12 @@ function NotesEditor({ jobId, initialNotes, onSaved }: { jobId: string; initialN
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <p className="text-xs text-gray-500">Notes</p>
+        <p className="text-xs text-white/30 uppercase tracking-widest font-semibold">Notes</p>
         <button
           onClick={save}
           disabled={saving}
-          className="px-3 py-1.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-40 text-white text-xs rounded-lg transition-colors"
+          className="px-3 py-1.5 disabled:opacity-40 text-white text-xs font-semibold rounded-lg transition-all glow-btn"
+          style={{ background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" }}
         >
           {saving ? "Saving..." : saved ? "Saved ✓" : "Save"}
         </button>
@@ -441,7 +460,7 @@ function NotesEditor({ jobId, initialNotes, onSaved }: { jobId: string; initialN
         onChange={(e) => setNotes(e.target.value)}
         placeholder="Add notes about this role, interview prep, company research..."
         rows={12}
-        className="w-full bg-[#111] border border-white/10 rounded-lg px-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-violet-500/50 resize-none"
+        className="w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-3 text-sm text-white/80 placeholder-white/25 focus:outline-none focus:border-violet-500/50 resize-none transition-colors"
       />
     </div>
   );

@@ -64,50 +64,54 @@ export default function JobsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-white">Applications</h1>
-          <p className="text-gray-500 text-sm mt-1">{jobs.length} job{jobs.length !== 1 ? "s" : ""} tracked</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Applications</h1>
+          <p className="text-white/35 text-sm mt-1">{jobs.length} job{jobs.length !== 1 ? "s" : ""} tracked</p>
         </div>
         <button
           onClick={() => setShowAdd(true)}
-          className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-lg transition-colors"
+          className="px-4 py-2.5 text-white text-sm font-semibold rounded-xl transition-all glow-btn"
+          style={{ background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" }}
         >
           + Add Job
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+      {/* Search */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <input
           type="text"
           placeholder="Search by title, company..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-violet-500/50"
+          className="flex-1 bg-white/[0.05] border border-white/[0.1] rounded-xl px-4 py-2.5 text-sm text-white/80 placeholder-white/25 focus:outline-none focus:border-violet-500/50 transition-colors"
         />
-        <div className="flex gap-1.5 flex-wrap">
-          {STATUSES.map((s) => (
-            <button
-              key={s}
-              onClick={() => setStatus(s)}
-              className={`px-3 py-2 rounded-lg text-xs font-medium transition-colors ${
-                status === s
-                  ? "bg-violet-600 text-white"
-                  : "bg-[#1a1a1a] text-gray-400 hover:text-gray-200 border border-white/10"
-              }`}
-            >
-              {STATUS_LABELS[s]}
-            </button>
-          ))}
-        </div>
+      </div>
+
+      {/* Status filter chips */}
+      <div className="flex gap-1.5 flex-wrap mb-6">
+        {STATUSES.map((s) => (
+          <button
+            key={s}
+            onClick={() => setStatus(s)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              status === s
+                ? "text-violet-300 border border-violet-500/40"
+                : "bg-white/[0.04] text-white/40 hover:text-white/65 border border-white/[0.08] hover:border-white/[0.15]"
+            }`}
+            style={status === s ? { background: "rgba(139,92,246,0.2)" } : {}}
+          >
+            {STATUS_LABELS[s]}
+          </button>
+        ))}
       </div>
 
       {/* Jobs List */}
       {loading ? (
-        <div className="text-center py-16 text-gray-600">Loading...</div>
+        <div className="text-center py-16 text-white/20">Loading...</div>
       ) : jobs.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-gray-500 text-lg mb-2">No applications found</p>
-          <p className="text-gray-600 text-sm">Add your first job to get started</p>
+          <p className="text-white/35 text-lg mb-2">No applications found</p>
+          <p className="text-white/20 text-sm">Add your first job to get started</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -115,18 +119,18 @@ export default function JobsPage() {
             <Link
               key={job.id}
               href={`/jobs/${job.id}`}
-              className="block bg-[#1a1a1a] border border-white/5 rounded-xl p-4 hover:border-white/10 hover:bg-[#1e1e1e] transition-all group"
+              className="block bg-white/[0.04] border border-white/[0.08] rounded-2xl p-4 hover:border-violet-500/30 hover:bg-white/[0.06] transition-all group"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium text-white group-hover:text-violet-300 transition-colors truncate">
+                  <div className="flex items-center gap-2.5 mb-1.5">
+                    <h3 className="font-semibold text-white/90 group-hover:text-violet-300 transition-colors truncate">
                       {job.title}
                     </h3>
                     <StatusBadge status={job.status} />
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-gray-500">
-                    <span className="font-medium text-gray-400">{job.companyName}</span>
+                  <div className="flex items-center gap-3 text-sm text-white/40">
+                    <span className="font-semibold text-white/60">{job.companyName}</span>
                     {job.location && (
                       <>
                         <span>·</span>
@@ -138,21 +142,21 @@ export default function JobsPage() {
                     {formatSalary(job.salaryMin, job.salaryMax) && (
                       <>
                         <span>·</span>
-                        <span className="text-emerald-500/80">{formatSalary(job.salaryMin, job.salaryMax)}</span>
+                        <span className="text-emerald-400/80 font-medium">{formatSalary(job.salaryMin, job.salaryMax)}</span>
                       </>
                     )}
                   </div>
                 </div>
                 <div className="text-right shrink-0">
                   {job.dateApplied && (
-                    <p className="text-xs text-gray-600">Applied {formatDate(job.dateApplied)}</p>
+                    <p className="text-xs text-white/25">Applied {formatDate(job.dateApplied)}</p>
                   )}
                   <div className="flex items-center gap-2 mt-1 justify-end">
                     {job._count?.activities > 0 && (
-                      <span className="text-xs text-gray-600">{job._count.activities} activities</span>
+                      <span className="text-xs text-white/25">{job._count.activities} activities</span>
                     )}
                     {job._count?.tasks > 0 && (
-                      <span className="text-xs text-gray-600">{job._count.tasks} tasks</span>
+                      <span className="text-xs text-white/25">{job._count.tasks} tasks</span>
                     )}
                   </div>
                 </div>

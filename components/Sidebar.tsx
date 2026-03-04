@@ -5,43 +5,68 @@ import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: "⬡" },
-  { href: "/jobs", label: "Applications", icon: "◈" },
-  { href: "/pipeline", label: "Pipeline", icon: "⬕" },
-  { href: "/contacts", label: "Contacts", icon: "◉" },
-  { href: "/tasks", label: "Tasks", icon: "◻" },
+  { href: "/dashboard",  label: "Dashboard",    icon: "⬡", section: "MAIN" },
+  { href: "/jobs",       label: "Applications", icon: "◈", section: "MAIN" },
+  { href: "/pipeline",   label: "Pipeline",     icon: "⬕", section: "MAIN" },
+  { href: "/contacts",   label: "Contacts",     icon: "◉", section: "NETWORK" },
+  { href: "/tasks",      label: "Tasks",        icon: "◻", section: "PRODUCTIVITY" },
 ];
 
 export default function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-56 bg-[#141414] border-r border-white/5 flex flex-col shrink-0">
-      <div className="px-5 py-5 border-b border-white/5">
+    <aside className="w-56 bg-[#0c0a1a] border-r border-white/[0.07] flex flex-col shrink-0 relative overflow-hidden">
+      {/* Subtle sidebar glow */}
+      <div className="absolute top-0 left-0 w-full h-48 pointer-events-none"
+        style={{ background: "radial-gradient(ellipse at top left, rgba(139,92,246,0.1) 0%, transparent 70%)" }} />
+
+      {/* Logo */}
+      <div className="px-5 py-5 border-b border-white/[0.07] relative">
         <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-lg bg-violet-600 flex items-center justify-center text-white font-bold text-sm">J</div>
-          <span className="font-semibold text-white text-sm tracking-tight">JobTrack</span>
+          <div
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-white font-bold text-sm glow-violet-sm"
+            style={{ background: "linear-gradient(135deg, #8b5cf6, #ec4899)" }}
+          >J</div>
+          <span className="font-bold text-white text-sm tracking-tight">JobTrack</span>
         </div>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-0.5">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+      {/* Nav */}
+      <nav className="flex-1 px-3 py-4 relative">
+        {["MAIN", "NETWORK", "PRODUCTIVITY"].map((section) => {
+          const items = navItems.filter((i) => i.section === section);
           return (
-            <Link key={item.href} href={item.href}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                isActive ? "bg-white/10 text-white font-medium" : "text-gray-400 hover:text-gray-200 hover:bg-white/5"
-              }`}>
-              <span className="text-base leading-none">{item.icon}</span>
-              {item.label}
-            </Link>
+            <div key={section} className="mb-3">
+              <p className="text-[10px] font-bold tracking-widest text-white/25 px-3 mb-1.5 uppercase">{section}</p>
+              <div className="space-y-0.5">
+                {items.map((item) => {
+                  const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all ${
+                        isActive
+                          ? "bg-violet-600/20 text-violet-300 font-semibold border border-violet-500/30"
+                          : "text-white/40 hover:text-white/75 hover:bg-white/[0.06] border border-transparent"
+                      }`}
+                    >
+                      <span className="text-base leading-none">{item.icon}</span>
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           );
         })}
       </nav>
 
-      <div className="px-5 py-4 border-t border-white/5 flex items-center gap-3">
+      {/* Footer */}
+      <div className="px-5 py-4 border-t border-white/[0.07] flex items-center gap-3">
         <UserButton appearance={{ elements: { avatarBox: "w-7 h-7" } }} />
-        <span className="text-xs text-gray-600">Account</span>
+        <span className="text-xs text-white/25">Account</span>
       </div>
     </aside>
   );

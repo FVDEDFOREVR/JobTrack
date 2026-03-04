@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #08060f;
+  --foreground: #f0f0f0;
+  --accent: #8b5cf6;
+  --accent-glow: rgba(139, 92, 246, 0.45);
 }
 
 @theme inline {
@@ -12,15 +14,30 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Vibrant glow utilities — must be in @layer utilities for Tailwind v4 specificity */
+@layer utilities {
+  .glow-violet {
+    box-shadow: 0 0 28px rgba(139, 92, 246, 0.5);
+  }
+  .glow-violet-sm {
+    box-shadow: 0 0 16px rgba(139, 92, 246, 0.35);
+  }
+  .glow-btn {
+    box-shadow: 0 0 24px rgba(139, 92, 246, 0.45), 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .glow-btn:hover {
+    box-shadow: 0 0 36px rgba(139, 92, 246, 0.65), 0 2px 12px rgba(0,0,0,0.5);
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
