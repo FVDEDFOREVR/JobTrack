@@ -58,6 +58,8 @@ export default function PipelinePage() {
 
   if (loading) return <div className="p-8 text-white/25">Loading...</div>;
 
+  const isEmpty = jobs.length === 0;
+
   return (
     <div className="p-8 h-full flex flex-col min-w-0 overflow-hidden">
       <div className="mb-6">
@@ -65,7 +67,26 @@ export default function PipelinePage() {
         <p className="text-white/35 text-sm mt-1">Drag cards to update status</p>
       </div>
 
-      <div className="flex gap-4 pb-4 flex-1">
+      {/* Empty state onboarding */}
+      {isEmpty && (
+        <div className="flex-1 flex items-center justify-center">
+          <div className="bg-white/[0.04] border border-violet-500/20 rounded-2xl p-10 text-center max-w-md w-full"
+            style={{ boxShadow: "0 0 60px rgba(139,92,246,0.08)" }}>
+            <div className="text-4xl mb-4 text-violet-400">⬕</div>
+            <h2 className="text-xl font-bold text-white mb-2 tracking-tight">Your job pipeline will appear here</h2>
+            <p className="text-white/40 text-sm mb-6 leading-relaxed">
+              Add your first application and move it through the hiring stages. Drag cards between columns to update status.
+            </p>
+            <a href="/jobs"
+              className="inline-block px-6 py-3 text-white font-semibold rounded-xl transition-all glow-btn"
+              style={{ background: "linear-gradient(135deg, #8b5cf6, #7c3aed)" }}>
+              Add your first application →
+            </a>
+          </div>
+        </div>
+      )}
+
+      {!isEmpty && <div className="flex gap-4 pb-4 flex-1">
         {STAGES.map((stage) => {
           const stageJobs = jobsByStatus(stage.key);
           const isOver = dragOver === stage.key;
@@ -123,14 +144,14 @@ export default function PipelinePage() {
                   <div className={`h-16 rounded-xl border-2 border-dashed flex items-center justify-center transition-colors ${
                     isOver ? "border-violet-500/40 text-violet-400" : "border-white/[0.07] text-white/20"
                   }`}>
-                    <span className="text-xs">Drop here</span>
+                    <span className="text-xs">Drag applications here</span>
                   </div>
                 )}
               </div>
             </div>
           );
         })}
-      </div>
+      </div>}
     </div>
   );
 }
