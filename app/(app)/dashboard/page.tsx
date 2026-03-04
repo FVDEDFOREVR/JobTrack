@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
   bookmarked:   { label: "Bookmarked",   color: "text-white/45" },
@@ -55,7 +56,14 @@ export default function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Dashboard</h1>
+          <Image
+            src="/JobTrack_Logo.png"
+            alt="JobTrack"
+            width={160}
+            height={45}
+            className="object-contain mb-1"
+            priority
+          />
           <p className="text-white/35 text-sm mt-1">Your job search at a glance</p>
         </div>
         <Link href="/jobs"
