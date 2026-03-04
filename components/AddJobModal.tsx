@@ -41,6 +41,7 @@ export default function AddJobModal({ onClose, onSaved }: { onClose: () => void;
   };
 
   const inputClass = "w-full bg-white/[0.05] border border-white/[0.1] rounded-xl px-3 py-2.5 text-sm text-white/80 placeholder-white/25 focus:outline-none focus:border-violet-500/50 transition-colors";
+  const selectClass = `${inputClass} [&>option]:bg-[#1a1530] [&>option]:text-white`;
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -79,7 +80,7 @@ export default function AddJobModal({ onClose, onSaved }: { onClose: () => void;
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className={inputClass}
+                className={selectClass}
               >
                 {STATUSES.map((s) => <option key={s.value} value={s.value}>{s.label}</option>)}
               </select>
@@ -100,7 +101,7 @@ export default function AddJobModal({ onClose, onSaved }: { onClose: () => void;
               <select
                 value={form.locationType}
                 onChange={(e) => setForm({ ...form, locationType: e.target.value })}
-                className={inputClass}
+                className={selectClass}
               >
                 <option value="remote">Remote</option>
                 <option value="hybrid">Hybrid</option>
